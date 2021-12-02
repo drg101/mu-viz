@@ -1,6 +1,13 @@
 import './style.css'
 
-document.querySelector('#app').innerHTML = `
-  <h1>Hello Vite!</h1>
-  <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
-`
+const music = new Audio('sound.wav');
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioCtx.createAnalyser();
+setTimeout(() => {
+    music.play();
+    const stream = music.captureStream()
+    const source = audioCtx.createMediaStreamSource(stream);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination)
+}, 1000)
+
