@@ -16,48 +16,40 @@ music.addEventListener("canplay", event => {
         console.log(source)
         source.connect(analyser);
         analyser.connect(audioCtx.destination)
-        analyser.fftSize = 2048;
+        analyser.fftSize = 256;
         bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
         console.log(stream.getTracks())
-        setInterval(() => {
-            dataArray = new Uint8Array(bufferLength);
-            analyser.getByteTimeDomainData(dataArray);
 
-        }, 100)
+        const c = document.getElementById("myCanvas");
+        const ctx = c.getContext("2d");
+        const WIDTH = ctx.canvas.width;
+        const HEIGHT = ctx.canvas.height;
+
+        const draw = () => {
+            analyser.getByteFrequencyData(dataArray);
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+            var barWidth = (WIDTH / bufferLength) * 2.5;
+            var barHeight;
+            var x = 0;
+            // console.log({bufferLength})
+            for (var i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 2;
+
+                ctx.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
+                ctx.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight);
+
+                x += barWidth + 1;
+            }
+
+            
+            requestAnimationFrame(draw)
+        }
+        requestAnimationFrame(draw)
     }
 
 });
 
-const c = document.getElementById("myCanvas");
-const ctx = c.getContext("2d");
-const WIDTH = ctx.canvas.width;
-const HEIGHT = ctx.canvas.height;
 
-const draw = () => {
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgb(0, 0, 0)';
-    ctx.beginPath();
-    var sliceWidth = WIDTH * 1.0 / bufferLength;
-    var x = 0;
-    for (var i = 0; i < bufferLength; i++) {
-
-        var v = dataArray[i] / 128.0;
-        var y = v * HEIGHT / 2;
-
-        if (i === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
-
-        x += sliceWidth;
-    }
-    ctx.lineTo(WIDTH, HEIGHT/2);
-    ctx.stroke();
-
-    requestAnimationFrame(draw)
-}
-requestAnimationFrame(draw)
 
 
