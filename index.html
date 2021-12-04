@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Vite App</title>
-  </head>
-  <body>
+</head>
+
+<body>
     <div id="app">
-        <button id="play">Play</button>
-        <canvas id="myCanvas" width="300" height="200"></canvas>
+        <input type='file' accept="audio/*" placeholder="" id="music-upload">
+        <canvas id="canv" width="100vw" height="100vh"></canvas>
     </div>
     <script type="module" src="/main.js"></script>
-  </body>
+</body>
+
 </html>
