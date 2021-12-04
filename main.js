@@ -49,20 +49,22 @@ const playMusic = (uri) => {
         ctx.canvas.height = window.innerHeight;
         let WIDTH = ctx.canvas.width;
         let HEIGHT = ctx.canvas.height;
-        let scaleBarriers = [6.875,13.75,27.5,55,110,220,440,880,1760,3520,7040,14080]
+        let scaleBarriers = [6.875, 13.75, 27.5, 55, 110, 220, 440, 880, 1760, 3520, 7040, 14080]
         const draw = () => {
-            const numBuckets = getBaseLog(2,scaleLen);
+            const numBuckets = getBaseLog(2, scaleLen);
             analyser.getByteFrequencyData(dataArray);
             ctx.clearRect(0, 0, WIDTH, HEIGHT);
             const barWidth = (WIDTH / numBuckets);
             let x = 0;
             let barHeight;
-            console.log(bufferLength)
+            // console.log(bufferLength)
             let buckets = []
             let oldBucketMax = 0;
-            for (let i = 1; i <= numBuckets; i++) {
-                let bucketMax = Math.floor(scaleBarriers[i-1] / maxFreq * scaleLen); 
-                console.log(`bucket start ${oldBucketMax} (${oldBucketMax * maxFreq / scaleLen}hz) bucket end ${bucketMax} (${bucketMax * maxFreq / scaleLen}hz)`)
+            console.log('loop')
+            let beatHeight = 0
+            for (let i = 0; i < scaleBarriers.length; i++) {
+                let bucketMax = Math.floor(scaleBarriers[i] / maxFreq * scaleLen);
+                // console.log(`bucket start ${oldBucketMax} (${oldBucketMax * maxFreq / scaleLen}hz) bucket end ${bucketMax} (${bucketMax * maxFreq / scaleLen}hz)`)
                 let sum = 0;
                 for (let j = oldBucketMax; j < bucketMax; j++) {
                     sum += dataArray[j];
@@ -75,11 +77,18 @@ const playMusic = (uri) => {
                 ctx.fillStyle = 'rgb(' + (barHeight / HEIGHT * 255) + ',50,50)';
                 ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
 
+                if(i >= 3 && i <= 5) {
+                    beatHeight += barHeight;
+                }
+
                 x += barWidth;
             }
+            beatHeight /= 3
+            ctx.fillStyle = `rgb(50,${(beatHeight / HEIGHT * 255)},${(beatHeight / HEIGHT * 255)})`;
+            ctx.fillRect(WIDTH/2, HEIGHT/2, beatHeight / 4, beatHeight / 4);
             // console.log(buckets)
 
-            
+
 
             requestAnimationFrame(draw)
         }
