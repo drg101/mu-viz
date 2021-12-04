@@ -49,7 +49,7 @@ const playMusic = (uri) => {
         ctx.canvas.height = window.innerHeight;
         let WIDTH = ctx.canvas.width;
         let HEIGHT = ctx.canvas.height;
-        let scaleBarriers = [7,14,28,55,110,220,440,880,1760,3520,7040,Infinity]
+        let scaleBarriers = [6.875,13.75,27.5,55,110,220,440,880,1760,3520,7040,14080]
         const draw = () => {
             const numBuckets = getBaseLog(2,scaleLen);
             analyser.getByteFrequencyData(dataArray);
@@ -61,7 +61,7 @@ const playMusic = (uri) => {
             let buckets = []
             let oldBucketMax = 0;
             for (let i = 1; i <= numBuckets; i++) {
-                let bucketMax = Math.pow(2,i)
+                let bucketMax = Math.floor(scaleBarriers[i-1] / maxFreq * scaleLen); 
                 console.log(`bucket start ${oldBucketMax} (${oldBucketMax * maxFreq / scaleLen}hz) bucket end ${bucketMax} (${bucketMax * maxFreq / scaleLen}hz)`)
                 let sum = 0;
                 for (let j = oldBucketMax; j < bucketMax; j++) {
