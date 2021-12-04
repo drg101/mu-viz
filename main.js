@@ -16,10 +16,18 @@ const onMusicUpload = () => {
     playMusic(uri)
 }
 
+const getBaseLog = (x, y) => {
+    return Math.log(y) / Math.log(x);
+}
+
+
+const scaleLen = 4096;
+const maxFreq = 48000 / 2;
+
 const playMusic = (uri) => {
     const music = new Audio(uri);
 
-    let bufferLength = 1024;
+    let bufferLength = scaleLen;
     let dataArray = new Uint8Array(bufferLength);
 
     music.addEventListener("canplay", event => {
@@ -31,7 +39,7 @@ const playMusic = (uri) => {
         const source = audioCtx.createMediaStreamSource(stream);
         console.log(source)
         source.connect(analyser);
-        analyser.fftSize = 2048;
+        analyser.fftSize = scaleLen * 2;
         bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
 
@@ -41,43 +49,37 @@ const playMusic = (uri) => {
         ctx.canvas.height = window.innerHeight;
         let WIDTH = ctx.canvas.width;
         let HEIGHT = ctx.canvas.height;
+        let scaleBarriers = [7,14,28,55,110,220,440,880,1760,3520,7040,Infinity]
         const draw = () => {
+            const numBuckets = getBaseLog(2,scaleLen);
             analyser.getByteFrequencyData(dataArray);
             ctx.clearRect(0, 0, WIDTH, HEIGHT);
-            var barWidth = (WIDTH / bufferLength);
-            var barHeight;
-            var x = 0;
-            // console.log(dataArray)
-            for (var i = 0; i < bufferLength; i++) {
-                barHeight = dataArray[i] / 256 * HEIGHT;
+            const barWidth = (WIDTH / numBuckets);
+            let x = 0;
+            let barHeight;
+            console.log(bufferLength)
+            let buckets = []
+            let oldBucketMax = 0;
+            for (let i = 1; i <= numBuckets; i++) {
+                let bucketMax = Math.pow(2,i)
+                console.log(`bucket start ${oldBucketMax} (${oldBucketMax * maxFreq / scaleLen}hz) bucket end ${bucketMax} (${bucketMax * maxFreq / scaleLen}hz)`)
+                let sum = 0;
+                for (let j = oldBucketMax; j < bucketMax; j++) {
+                    sum += dataArray[j];
+                }
+                let avg = sum / (bucketMax - oldBucketMax);
+                buckets.push(avg)
+                oldBucketMax = bucketMax;
+                barHeight = avg / 256 * HEIGHT;
 
                 ctx.fillStyle = 'rgb(' + (barHeight / HEIGHT * 255) + ',50,50)';
                 ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
 
-                x += barWidth + 1;
+                x += barWidth;
             }
+            // console.log(buckets)
 
-            analyser.getByteTimeDomainData(dataArray);
-            ctx.lineWidth = 5;
-            ctx.strokeStyle = 'rgb(0, 0, 0)';
-            ctx.beginPath();
-            var sliceWidth = WIDTH * 1.0 / bufferLength;
-            var x = 0;
-            for (var i = 0; i < bufferLength; i++) {
-
-                var v = dataArray[i] / 128.0;
-                var y = v * HEIGHT / 2;
-
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-
-                x += sliceWidth;
-            }
-            ctx.lineTo(WIDTH, HEIGHT/2);
-            ctx.stroke();
+            
 
             requestAnimationFrame(draw)
         }
