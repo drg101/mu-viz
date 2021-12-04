@@ -61,7 +61,6 @@ const playMusic = (uri) => {
             let buckets = []
             let oldBucketMax = 0;
             console.log('loop')
-            let beatHeight = 0
             for (let i = 0; i < scaleBarriers.length; i++) {
                 let bucketMax = Math.floor(scaleBarriers[i] / maxFreq * scaleLen);
                 // console.log(`bucket start ${oldBucketMax} (${oldBucketMax * maxFreq / scaleLen}hz) bucket end ${bucketMax} (${bucketMax * maxFreq / scaleLen}hz)`)
@@ -72,20 +71,20 @@ const playMusic = (uri) => {
                 let avg = sum / (bucketMax - oldBucketMax);
                 buckets.push(avg)
                 oldBucketMax = bucketMax;
-                barHeight = avg / 256 * HEIGHT;
+            }
+            const beatHeight = buckets[4]
 
-                ctx.fillStyle = 'rgb(' + (barHeight / HEIGHT * 255) + ',50,50)';
+            ctx.fillStyle = `rgb(${beatHeight/1.3},${beatHeight/1.3},${beatHeight/1.3})`;
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+            for(const avg of buckets) {
+                const barHeight = avg / 256 * HEIGHT;
+                ctx.fillStyle = 'hsl(' + (barHeight / HEIGHT * 360) + ' 100% 60%)';
                 ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
-
-                if(i >= 3 && i <= 5) {
-                    beatHeight += barHeight;
-                }
-
                 x += barWidth;
             }
-            beatHeight /= 3
-            ctx.fillStyle = `rgb(50,${(beatHeight / HEIGHT * 255)},${(beatHeight / HEIGHT * 255)})`;
-            ctx.fillRect(WIDTH/2, HEIGHT/2, beatHeight / 4, beatHeight / 4);
+             
+            // ctx.fillStyle = `rgb(50,${(beatHeight / HEIGHT * 255)},${(beatHeight / HEIGHT * 255)})`;
+            // ctx.fillRect(WIDTH/2, HEIGHT/2, beatHeight / 4, beatHeight / 4);
             // console.log(buckets)
 
 
