@@ -48,9 +48,17 @@ const playMusic = (uri) => {
         const ctx = c.getContext("2d");
         ctx.canvas.width = window.innerWidth;
         ctx.canvas.height = window.innerHeight;
+        
         let WIDTH = ctx.canvas.width;
         let HEIGHT = ctx.canvas.height;
+
+        setInterval(() => {
+            WIDTH = ctx.canvas.width;
+            HEIGHT = ctx.canvas.height;
+        }, 100)
+
         let scaleBarriers = [6.875, 13.75, 27.5, 55, 110, 220, 440, 880, 1760, 3520, 7040, 14080]
+        
         const draw = () => {
             const numBuckets = getBaseLog(2, scaleLen);
             analyser.getByteFrequencyData(dataArray);
@@ -83,12 +91,6 @@ const playMusic = (uri) => {
                 ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
                 x += barWidth;
             }
-             
-            // ctx.fillStyle = `rgb(50,${(beatHeight / HEIGHT * 255)},${(beatHeight / HEIGHT * 255)})`;
-            // ctx.fillRect(WIDTH/2, HEIGHT/2, beatHeight / 4, beatHeight / 4);
-            // console.log(buckets)
-
-
 
             requestAnimationFrame(draw)
         }
