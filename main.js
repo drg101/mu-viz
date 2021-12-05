@@ -33,12 +33,13 @@ const playMusic = (uri) => {
     music.addEventListener("canplay", event => {
         music.play()
         music.loop = true
-        const stream = music.captureStream()
+        // const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const analyser = audioCtx.createAnalyser();
-        const source = audioCtx.createMediaStreamSource(stream);
-        console.log(source)
+        const source = audioCtx.createMediaElementSource(music);
+        source.disconnect()
         source.connect(analyser);
+        analyser.connect(audioCtx.destination)
         analyser.fftSize = scaleLen * 2;
         bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
