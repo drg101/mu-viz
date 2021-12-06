@@ -2,6 +2,26 @@ import './style.css'
 
 const inputElement = document.getElementById("music-upload");
 const canv = document.getElementById("canv")
+const app = document.getElementById("app")
+
+const ctx = canv.getContext("2d");
+ctx.canvas.width = window.innerWidth;
+ctx.canvas.height = window.innerHeight;
+let WIDTH = ctx.canvas.width;
+let HEIGHT = ctx.canvas.height;
+const music = new Audio();
+let musicPlaying = false;
+
+setInterval(() => {
+    WIDTH = ctx.canvas.width;
+    HEIGHT = ctx.canvas.height;
+}, 100)
+
+ctx.font = "48px Arial";
+ctx.fillStyle = "white";
+ctx.textAlign = "center";
+ctx.fillText("Select a song with \"Choose File\" or drag and drop.", WIDTH/2, HEIGHT/2 - 35);
+ctx.fillText("⚠️Flashing Colors & Lights⚠️", WIDTH/2, HEIGHT/2 + 35);
 
 const setListeners = () => {
     inputElement.addEventListener("change", onMusicUpload, false);
@@ -9,24 +29,29 @@ const setListeners = () => {
 
 const onMusicUpload = () => {
     console.log('here')
-    inputElement.style.display = "none";
     canv.style.display = "block";
     const selectedFile = inputElement.files[0];
     const uri = URL.createObjectURL(selectedFile);
-    playMusic(uri)
+    music.pause();
+    music.src = uri;
+    music.load();
+    musicPlaying || playMusic()
 }
 
 const getBaseLog = (x, y) => {
     return Math.log(y) / Math.log(x);
 }
 
+function argMax(array) {
+    return array.map((x, i) => [x, i]).reduce((r, a) => (a[0] > r[0] ? a : r))[1];
+}
+
 
 const scaleLen = 4096;
 const maxFreq = 48000 / 2;
 
-const playMusic = (uri) => {
-    const music = new Audio(uri);
-
+const playMusic = () => {
+    musicPlaying = true;
     let bufferLength = scaleLen;
     let dataArray = new Uint8Array(bufferLength);
 
@@ -44,21 +69,8 @@ const playMusic = (uri) => {
         bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
 
-        const c = document.getElementById("canv");
-        const ctx = c.getContext("2d");
-        ctx.canvas.width = window.innerWidth;
-        ctx.canvas.height = window.innerHeight;
-        
-        let WIDTH = ctx.canvas.width;
-        let HEIGHT = ctx.canvas.height;
-
-        setInterval(() => {
-            WIDTH = ctx.canvas.width;
-            HEIGHT = ctx.canvas.height;
-        }, 100)
-
         let scaleBarriers = [6.875, 13.75, 27.5, 55, 110, 220, 440, 880, 1760, 3520, 7040, 14080]
-        
+
         const draw = () => {
             const numBuckets = getBaseLog(2, scaleLen);
             analyser.getByteFrequencyData(dataArray);
@@ -81,11 +93,19 @@ const playMusic = (uri) => {
                 buckets.push(avg)
                 oldBucketMax = bucketMax;
             }
-            const beatHeight = buckets[4]
+            const beatIndex = 4
+            const beatHeight = buckets[beatIndex]
+            const beatScale = 1 - (1 / scaleBarriers.length * beatIndex)
+            const beatLambda = 1.5;
+            const beatValue = beatScale * beatHeight / beatLambda;
 
-            ctx.fillStyle = `rgb(${beatHeight/1.3},${beatHeight/1.3},${beatHeight/1.3})`;
+            canv.style.transform = `scale(${1 + beatValue / 255 * 0.1})`
+
+            ctx.fillStyle = `rgb(${beatValue},${beatValue},${beatValue})`;
+            app.style.backgroundColor = `rgb(${beatValue},${beatValue},${beatValue})`;
+            canv.style.borderColor = `rgb(${255 - beatValue},${255 - beatValue},${255 - beatValue})`;
             ctx.fillRect(0, 0, WIDTH, HEIGHT);
-            for(const avg of buckets) {
+            for (const avg of buckets) {
                 const barHeight = avg / 256 * HEIGHT;
                 ctx.fillStyle = 'hsl(' + (barHeight / HEIGHT * 360) + ' 100% 60%)';
                 ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
