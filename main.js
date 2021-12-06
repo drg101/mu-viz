@@ -5,6 +5,7 @@ const canv = document.getElementById("canv")
 const app = document.getElementById("app")
 const songlabel = document.getElementById("song-label")
 const playpause = document.getElementById("playpause")
+const allowFlashing = document.getElementById("allowflash")
 
 const ctx = canv.getContext("2d");
 ctx.canvas.width = window.innerWidth;
@@ -14,6 +15,7 @@ let HEIGHT = ctx.canvas.height;
 const music = new Audio();
 let musicPlaying = false;
 let paused = true;
+let allowFlash = true;
 
 setInterval(() => {
     WIDTH = ctx.canvas.width;
@@ -55,6 +57,21 @@ const playPause = () => {
 
 playpause.onclick = playPause;
 
+const changeFlashing = () => {
+    allowFlash = !allowFlash;
+    allowFlashing.innerHTML = allowFlash ? "Disable Dynamic Colors" : "Enable Dynamic Colors";
+    if(!allowFlash){
+        playpause.style = {}
+        songlabel.style = {}
+        app.style = {}
+        allowFlashing.style = {}
+    }
+    if(musicPlaying){
+        playpause.style.display = 'inline-block'
+    }
+}
+
+allowFlashing.onclick = changeFlashing;
 
 const getBaseLog = (x, y) => {
     return Math.log(y) / Math.log(x);
@@ -132,18 +149,28 @@ const playMusic = () => {
 
             canv.style.transform = `scale(${1 + beatValue / 255 * 0.1})`
 
-
-            ctx.fillStyle = `rgb(${beatValue},${beatValue},${beatValue})`;
-            app.style.backgroundColor = `rgb(${beatValue},${beatValue},${beatValue})`;
-            
-            const coolColor = 'hsl(' + (360 - (loudness / 256 * 360)) + ' 100% 60%)';
-            canv.style.borderColor = `rgb(${255 - beatValue},${255 - beatValue},${255 - beatValue})`;
-            songlabel.style.backgroundColor = coolColor;
-            playpause.style.backgroundColor = coolColor;
+            if(allowFlash){
+                ctx.fillStyle = `rgb(${beatValue},${beatValue},${beatValue})`;
+                app.style.backgroundColor = `rgb(${beatValue},${beatValue},${beatValue})`;
+                
+                const coolColor = 'hsl(' + (360 - (loudness / 256 * 360)) + ' 100% 60%)';
+                canv.style.borderColor = `rgb(${255 - beatValue},${255 - beatValue},${255 - beatValue})`;
+                songlabel.style.backgroundColor = coolColor;
+                playpause.style.backgroundColor = coolColor;
+                allowFlashing.style.backgroundColor = coolColor;
+            }
+            else {
+                ctx.fillStyle = '#202124'
+            }
             ctx.fillRect(0, 0, WIDTH, HEIGHT);
             for (const avg of buckets) {
                 const barHeight = avg / 256 * HEIGHT;
-                ctx.fillStyle = 'hsl(' + (barHeight / HEIGHT * 360) + ' 100% 60%)';
+                if(allowFlash) {
+                    ctx.fillStyle = 'hsl(' + (barHeight / HEIGHT * 360) + ' 100% 60%)';
+                }
+                else {
+                    ctx.fillStyle = 'hsl(0 100% 60%)';
+                }
                 ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
                 // ctx.beginPath();
                 // ctx.ellipse(x + barWidth / 2, HEIGHT - barHeight, barWidth / 2, barWidth / 6, 0,  0, Math.PI * 2);
