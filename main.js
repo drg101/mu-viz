@@ -32,7 +32,7 @@ ctx.fillStyle = "white";
 ctx.textAlign = "center";
 ctx.fillText("Music Visualizer", WIDTH / 2, HEIGHT / 2 - Math.floor(80 * ratio));
 ctx.font = `${Math.floor(48 * ratio)}px Roboto`;
-ctx.fillText("Select a song or drag and music file drop onto this page.", WIDTH / 2, HEIGHT / 2);
+ctx.fillText("Select a song or drag a music file onto this page.", WIDTH / 2, HEIGHT / 2);
 ctx.fillText("⚠️Flashing Colors & Lights⚠️", WIDTH / 2, HEIGHT / 2 + Math.floor(70 * ratio));
 
 const setListeners = () => {
