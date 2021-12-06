@@ -3,6 +3,7 @@ import './style.css'
 const inputElement = document.getElementById("music-upload");
 const canv = document.getElementById("canv")
 const app = document.getElementById("app")
+const songlabel = document.getElementById("song-label")
 
 const ctx = canv.getContext("2d");
 ctx.canvas.width = window.innerWidth;
@@ -17,20 +18,24 @@ setInterval(() => {
     HEIGHT = ctx.canvas.height;
 }, 100)
 
-ctx.font = "48px Arial";
+const ratio = WIDTH / 1600;
+
+ctx.font = `${Math.floor(72 * ratio)}px Roboto`;
 ctx.fillStyle = "white";
 ctx.textAlign = "center";
-ctx.fillText("Select a song with \"Choose File\" or drag and drop.", WIDTH/2, HEIGHT/2 - 35);
-ctx.fillText("⚠️Flashing Colors & Lights⚠️", WIDTH/2, HEIGHT/2 + 35);
+ctx.fillText("Music Visualizer", WIDTH/2, HEIGHT/2 - Math.floor(80 * ratio));
+ctx.font = `${Math.floor(48 * ratio)}px Roboto`;
+ctx.fillText("Select a song or drag and music file drop onto this page.", WIDTH/2, HEIGHT/2);
+ctx.fillText("⚠️Flashing Colors & Lights⚠️", WIDTH/2, HEIGHT/2 + Math.floor(70 * ratio));
 
 const setListeners = () => {
     inputElement.addEventListener("change", onMusicUpload, false);
 }
 
 const onMusicUpload = () => {
-    console.log('here')
     canv.style.display = "block";
     const selectedFile = inputElement.files[0];
+    songlabel.innerHTML = selectedFile.name.length < 20 ? selectedFile.name : selectedFile.name.slice(0,17) + "...";
     const uri = URL.createObjectURL(selectedFile);
     music.pause();
     music.src = uri;
