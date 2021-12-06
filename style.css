@@ -54,7 +54,8 @@ body {
 .file-input label {
     display: block;
     position: relative;
-    width: 200px;
+    padding-left: 20px;
+    padding-right: 20px;
     height: 50px;
     border-radius: 25px;
     background-color: hsl(0 100% 60%);
@@ -81,12 +82,13 @@ body {
     border: none;
 }
 
-#allowflash {
+.allowflash {
     color: #fff;
     margin-left: 50px;
     font-family: 'Roboto', sans-serif;
     height: 50px;
-    width: 200px;
+    padding-left: 20px;
+    padding-right: 20px;
     border-radius: 25px;
     background-color: hsl(0 100% 60%);
     box-shadow: 0 4px 7px rgba(0, 0, 0, 0.4);

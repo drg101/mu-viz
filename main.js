@@ -6,6 +6,8 @@ const app = document.getElementById("app")
 const songlabel = document.getElementById("song-label")
 const playpause = document.getElementById("playpause")
 const allowFlashing = document.getElementById("allowflash")
+const allowbgFlashing = document.getElementById("allowbackflash")
+
 
 const ctx = canv.getContext("2d");
 ctx.canvas.width = window.innerWidth;
@@ -16,6 +18,7 @@ const music = new Audio();
 let musicPlaying = false;
 let paused = true;
 let allowFlash = true;
+let allowbgFlash = true;
 
 setInterval(() => {
     WIDTH = ctx.canvas.width;
@@ -37,10 +40,11 @@ const setListeners = () => {
 }
 
 const onMusicUpload = (file) => {
-    const selectedFile = file ?? inputElement.files[0];
+    const selectedFile = file.isTrusted ? inputElement.files[0] : file;
     if (!selectedFile) {
         return;
     }
+    console.log(selectedFile)
     songlabel.innerHTML = selectedFile.name.length < 20 ? selectedFile.name : selectedFile.name.slice(0, 17) + "...";
     const uri = URL.createObjectURL(selectedFile);
     music.pause();
@@ -63,8 +67,8 @@ const changeFlashing = () => {
     if (!allowFlash) {
         playpause.style = {}
         songlabel.style = {}
-        app.style = {}
         allowFlashing.style = {}
+        allowbgFlashing.style = {}
     }
     if (musicPlaying) {
         playpause.style.display = 'inline-block'
@@ -72,6 +76,20 @@ const changeFlashing = () => {
 }
 
 allowFlashing.onclick = changeFlashing;
+
+
+const changebgFlashing = () => {
+    allowbgFlash = !allowbgFlash;
+    allowbgFlashing.innerHTML = allowbgFlash ? "Disable Background Flash" : "Enable Background Flash";
+    if (!allowbgFlash) {
+        app.style = {}
+    }
+    if (musicPlaying) {
+        playpause.style.display = 'inline-block'
+    }
+}
+
+allowbgFlashing.onclick = changebgFlashing;
 
 window.dropHandler = (ev) => {
     console.log(ev)
@@ -179,14 +197,17 @@ const playMusic = () => {
             canv.style.transform = `scale(${1 + beatValue / 255 * 0.1})`
 
             if (allowFlash) {
-                ctx.fillStyle = `rgb(${beatValue},${beatValue},${beatValue})`;
-                app.style.backgroundColor = `rgb(${beatValue},${beatValue},${beatValue})`;
-
                 const coolColor = 'hsl(' + (360 - (loudness / 256 * 360)) + ' 100% 60%)';
-                canv.style.borderColor = `rgb(${255 - beatValue},${255 - beatValue},${255 - beatValue})`;
                 songlabel.style.backgroundColor = coolColor;
                 playpause.style.backgroundColor = coolColor;
                 allowFlashing.style.backgroundColor = coolColor;
+                allowbgFlashing.style.backgroundColor = coolColor;
+            }
+
+            if (allowbgFlash){
+                app.style.backgroundColor = `rgb(${beatValue},${beatValue},${beatValue})`;
+                canv.style.borderColor = `rgb(${255 - beatValue},${255 - beatValue},${255 - beatValue})`;
+                ctx.fillStyle = `rgb(${beatValue},${beatValue},${beatValue})`;
             }
             else {
                 ctx.fillStyle = '#202124'
