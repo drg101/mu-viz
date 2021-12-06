@@ -1,5 +1,3 @@
-import './style.css'
-
 const inputElement = document.getElementById("music-upload");
 const canv = document.getElementById("canv")
 const app = document.getElementById("app")
