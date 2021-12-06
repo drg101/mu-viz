@@ -36,9 +36,9 @@ const setListeners = () => {
     inputElement.addEventListener("change", onMusicUpload, false);
 }
 
-const onMusicUpload = () => {
-    const selectedFile = inputElement.files[0];
-    if(!selectedFile) {
+const onMusicUpload = (file) => {
+    const selectedFile = file ?? inputElement.files[0];
+    if (!selectedFile) {
         return;
     }
     songlabel.innerHTML = selectedFile.name.length < 20 ? selectedFile.name : selectedFile.name.slice(0, 17) + "...";
@@ -60,18 +60,47 @@ playpause.onclick = playPause;
 const changeFlashing = () => {
     allowFlash = !allowFlash;
     allowFlashing.innerHTML = allowFlash ? "Disable Dynamic Colors" : "Enable Dynamic Colors";
-    if(!allowFlash){
+    if (!allowFlash) {
         playpause.style = {}
         songlabel.style = {}
         app.style = {}
         allowFlashing.style = {}
     }
-    if(musicPlaying){
+    if (musicPlaying) {
         playpause.style.display = 'inline-block'
     }
 }
 
 allowFlashing.onclick = changeFlashing;
+
+window.dropHandler = (ev) => {
+    console.log(ev)
+    ev.preventDefault();
+    if (ev.dataTransfer.items) {
+        // Use DataTransferItemList interface to access the file(s)
+        for (var i = 0; i < ev.dataTransfer.items.length; i++) {
+            // If dropped items aren't files, reject them
+            if (ev.dataTransfer.items[i].kind === 'file') {
+                const file = ev.dataTransfer.items[i].getAsFile();
+                console.log('... file[' + i + '].name = ' + file.name);
+                onMusicUpload(file)
+                return;
+            }
+        }
+    } else {
+        // Use DataTransfer interface to access the file(s)
+        for (var i = 0; i < ev.dataTransfer.files.length; i++) {
+            console.log('... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
+        }
+    }
+}
+
+window.dragOverHandler = (ev) => {
+    console.log('File(s) in drop zone');
+
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+}
 
 const getBaseLog = (x, y) => {
     return Math.log(y) / Math.log(x);
@@ -83,14 +112,14 @@ function argMax(array) {
 
 const mean = arr => {
     const sum = arr.reduce((acc, cur) => acc + cur);
-    const average = sum/arr.length;
+    const average = sum / arr.length;
     return average;
 }
 
 
 const scaleLen = 4096;
 const maxFreq = 48000 / 2;
-
+let analyser;
 const playMusic = () => {
     let bufferLength = scaleLen;
     let dataArray = new Uint8Array(bufferLength);
@@ -102,7 +131,7 @@ const playMusic = () => {
         playpause.innerHTML = '⏸'
         music.loop = true
         // const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
-        let audioCtx, analyser, source;
+        let audioCtx, source;
         if (!musicPlaying) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioCtx.createAnalyser();
@@ -149,10 +178,10 @@ const playMusic = () => {
 
             canv.style.transform = `scale(${1 + beatValue / 255 * 0.1})`
 
-            if(allowFlash){
+            if (allowFlash) {
                 ctx.fillStyle = `rgb(${beatValue},${beatValue},${beatValue})`;
                 app.style.backgroundColor = `rgb(${beatValue},${beatValue},${beatValue})`;
-                
+
                 const coolColor = 'hsl(' + (360 - (loudness / 256 * 360)) + ' 100% 60%)';
                 canv.style.borderColor = `rgb(${255 - beatValue},${255 - beatValue},${255 - beatValue})`;
                 songlabel.style.backgroundColor = coolColor;
@@ -165,7 +194,7 @@ const playMusic = () => {
             ctx.fillRect(0, 0, WIDTH, HEIGHT);
             for (const avg of buckets) {
                 const barHeight = avg / 256 * HEIGHT;
-                if(allowFlash) {
+                if (allowFlash) {
                     ctx.fillStyle = 'hsl(' + (barHeight / HEIGHT * 360) + ' 100% 60%)';
                 }
                 else {
