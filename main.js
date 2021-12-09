@@ -177,8 +177,10 @@ const playMusic = () => {
         if (!musicPlaying) {
             audioCtx = new (window.AudioContext ?? window.webkitAudioContext)();
             analyser = audioCtx.createAnalyser();
-            source = audioCtx.createMediaElementSource(music);
-            source.connect(audioCtx.destination);
+            const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
+            // source = audioCtx.createMediaElementSource(music);
+            source = audioCtx.createMediaStreamSource(stream);
+            // source.connect(audioCtx.destination);
             source.connect(analyser);
             analyser.fftSize = scaleLen * 2;
             bufferLength = analyser.frequencyBinCount;
