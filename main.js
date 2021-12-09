@@ -179,7 +179,7 @@ const playMusic = () => {
             analyser = audioCtx.createAnalyser();
             source = audioCtx.createMediaElementSource(music);
             source.connect(audioCtx.destination);
-            source.connect(analyser);
+            // source.connect(analyser);
             analyser.fftSize = scaleLen * 2;
             bufferLength = analyser.frequencyBinCount;
             musicPlaying = true;
