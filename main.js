@@ -132,7 +132,7 @@ const mean = arr => {
     return average;
 }
 
-
+let notPlaying = false;
 const scaleLen = 4096;
 const maxFreq = 48000 / 2;
 let analyser;
@@ -140,10 +140,9 @@ const playMusic = () => {
     let bufferLength = scaleLen;
     let dataArray = new Uint8Array(bufferLength);
 
-    music.addEventListener("canplay", event => {
-        let notPlaying = false;
+    music.addEventListener("canplay", async event => {
         try {
-            music.play()
+            await music.play()
             paused = false;
             playpause.style.display = 'inline-block'
             playpause.innerHTML = '⏸'
@@ -229,10 +228,10 @@ const playMusic = () => {
                 else {
                     ctx.fillStyle = 'hsl(0 100% 60%)';
                 }
-                ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
-                // ctx.beginPath();
-                // ctx.ellipse(x + barWidth / 2, HEIGHT - barHeight, barWidth / 2, barWidth / 6, 0,  0, Math.PI * 2);
-                // ctx.fill();
+                ctx.fillRect(x, HEIGHT - barHeight + barWidth / 2, barWidth, barHeight);
+                ctx.beginPath();
+                ctx.ellipse(x + barWidth / 2, HEIGHT - barHeight + barWidth / 2, barWidth / 2, barWidth / 2, 0,  0, Math.PI * 2);
+                ctx.fill();
                 x += barWidth;
             }
 
