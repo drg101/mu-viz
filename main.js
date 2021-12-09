@@ -153,8 +153,25 @@ const playMusic = () => {
     let dataArray = new Uint8Array(bufferLength);
 
     music.addEventListener("canplay", async event => {
+        let audioCtx, source;
         if (!safariAgent) {
             await music.play()
+            paused = false;
+            playpause.style.display = 'inline-block'
+            playpause.innerHTML = '⏸'
+
+            music.loop = true
+            // const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
+            if (!musicPlaying) {
+                audioCtx = new (window.AudioContext ?? window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                source = audioCtx.createMediaElementSource(music);
+                source.connect(audioCtx.destination);
+                source.connect(analyser);
+                analyser.fftSize = scaleLen * 2;
+                bufferLength = analyser.frequencyBinCount;
+                musicPlaying = true;
+            }
         }
         else {
             paused = true;
@@ -163,27 +180,27 @@ const playMusic = () => {
             await new Promise((resolve) => {
                 playpause.addEventListener('click', async () => {
                     await music.play()
+                    paused = false;
+                    playpause.style.display = 'inline-block'
+                    playpause.innerHTML = '⏸'
+        
+                    music.loop = true
+                    // const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
+                    if (!musicPlaying) {
+                        audioCtx = new (window.AudioContext ?? window.webkitAudioContext)();
+                        analyser = audioCtx.createAnalyser();
+                        source = audioCtx.createMediaElementSource(music);
+                        source.connect(audioCtx.destination);
+                        source.connect(analyser);
+                        analyser.fftSize = scaleLen * 2;
+                        bufferLength = analyser.frequencyBinCount;
+                        musicPlaying = true;
+                    }
                     resolve()
                 })
             })
         }
-        paused = false;
-        playpause.style.display = 'inline-block'
-        playpause.innerHTML = '⏸'
-
-        music.loop = true
-        // const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
-        let audioCtx, source;
-        if (!musicPlaying) {
-            audioCtx = new (window.AudioContext ?? window.webkitAudioContext)();
-            analyser = audioCtx.createAnalyser();
-            source = audioCtx.createMediaElementSource(music);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
-            analyser.fftSize = scaleLen * 2;
-            bufferLength = analyser.frequencyBinCount;
-            musicPlaying = true;
-        }
+        
         dataArray = new Uint8Array(bufferLength);
 
         let scaleBarriers = [6.875, 13.75, 27.5, 55, 110, 220, 440, 880, 1760, 3520, 7040, 14080]
