@@ -132,7 +132,6 @@ const mean = arr => {
     return average;
 }
 
-let notPlaying = false;
 const scaleLen = 4096;
 const maxFreq = 48000 / 2;
 let analyser;
@@ -147,12 +146,19 @@ const playMusic = () => {
             playpause.style.display = 'inline-block'
             playpause.innerHTML = '⏸'
         }
-        catch(e) {
+        catch (e) {
             console.error(e)
             paused = true;
             playpause.style.display = 'inline-block'
             playpause.innerHTML = '▶️'
-            notPlaying = true;
+            await new Promise(resolve => {
+                playpause.addEventListener("click", async function () {
+                    await music.play()
+                    resolve();
+                });
+            })
+            console.log({paused})
+            console.log("made it out!")
         }
         music.loop = true
         // const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
@@ -211,7 +217,7 @@ const playMusic = () => {
                 allowbgFlashing.style.backgroundColor = coolColor;
             }
 
-            if (allowbgFlash){
+            if (allowbgFlash) {
                 app.style.backgroundColor = `rgb(${beatValue},${beatValue},${beatValue})`;
                 canv.style.borderColor = `rgb(${255 - beatValue},${255 - beatValue},${255 - beatValue})`;
                 ctx.fillStyle = `rgb(${beatValue},${beatValue},${beatValue})`;
@@ -230,7 +236,7 @@ const playMusic = () => {
                 }
                 ctx.fillRect(x, HEIGHT - barHeight + barWidth / 2, barWidth, barHeight);
                 ctx.beginPath();
-                ctx.ellipse(x + barWidth / 2, HEIGHT - barHeight + barWidth / 2, barWidth / 2, barWidth / 2, 0,  0, Math.PI * 2);
+                ctx.ellipse(x + barWidth / 2, HEIGHT - barHeight + barWidth / 2, barWidth / 2, barWidth / 2, 0, 0, Math.PI * 2);
                 ctx.fill();
                 x += barWidth;
             }
