@@ -163,6 +163,7 @@ const playMusic = () => {
             await new Promise((resolve) => {
                 playpause.addEventListener('click', async () => {
                     await music.play()
+                    resolve()
                 })
             })
         }
