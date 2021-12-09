@@ -161,10 +161,12 @@ const playMusic = () => {
             playpause.style.display = 'inline-block'
             playpause.innerHTML = '▶️'
             await new Promise((resolve) => {
-                playpause.addEventListener('click', async () => {
+                const oncleek = async () => {
                     await music.play()
+                    playpause.removeEventListener('click', oncleek)
                     resolve()
-                })
+                }
+                playpause.addEventListener('click', oncleek)
             })
         }
         paused = false;
