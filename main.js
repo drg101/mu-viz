@@ -6,6 +6,15 @@ const playpause = document.getElementById("playpause")
 const allowFlashing = document.getElementById("allowflash")
 const allowbgFlashing = document.getElementById("allowbackflash")
 
+// Detect Safari
+const userAgentString = navigator.userAgent;
+let chromeAgent = userAgentString.indexOf("Chrome") > -1;
+let safariAgent = userAgentString.indexOf("Safari") > -1;
+
+// Discard Safari since it also matches Chrome
+if ((chromeAgent) && (safariAgent)) safariAgent = false;
+console.log({ safariAgent })
+
 
 const ctx = canv.getContext("2d");
 ctx.canvas.width = window.innerWidth;
@@ -52,6 +61,10 @@ const onMusicUpload = (file) => {
 }
 
 const playPause = () => {
+    if (!musicPlaying) {
+        console.log("no need to start playing")
+        return;
+    }
     paused = !paused;
     playpause.innerHTML = paused ? '▶️' : '⏸'
     paused ? music.pause() : music.play()
@@ -140,7 +153,19 @@ const playMusic = () => {
     let dataArray = new Uint8Array(bufferLength);
 
     music.addEventListener("canplay", async event => {
-        await music.play()
+        if (!safariAgent) {
+            await music.play()
+        }
+        else {
+            paused = true;
+            playpause.style.display = 'inline-block'
+            playpause.innerHTML = '▶️'
+            await new Promise((resolve) => {
+                playpause.addEventListener('click', async () => {
+                    await music.play()
+                })
+            })
+        }
         paused = false;
         playpause.style.display = 'inline-block'
         playpause.innerHTML = '⏸'
