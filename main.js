@@ -164,11 +164,14 @@ const playMusic = () => {
         // const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
         let audioCtx, source;
         if (!musicPlaying) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx = new (window.AudioContext ?? window.webkitAudioContext)();
+            console.log({audioCtx})
             analyser = audioCtx.createAnalyser();
+            console.log({analyser})
             source = audioCtx.createMediaElementSource(music);
             source.disconnect()
             source.connect(analyser);
+            console.log({source})
             analyser.connect(audioCtx.destination)
             analyser.fftSize = scaleLen * 2;
             bufferLength = analyser.frequencyBinCount;
@@ -179,6 +182,7 @@ const playMusic = () => {
         let scaleBarriers = [6.875, 13.75, 27.5, 55, 110, 220, 440, 880, 1760, 3520, 7040, 14080]
 
         const draw = () => {
+            console.log("loop")
             const numBuckets = getBaseLog(2, scaleLen);
             analyser.getByteFrequencyData(dataArray);
             ctx.clearRect(0, 0, WIDTH, HEIGHT);
