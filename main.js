@@ -141,10 +141,20 @@ const playMusic = () => {
     let dataArray = new Uint8Array(bufferLength);
 
     music.addEventListener("canplay", event => {
-        music.play()
-        paused = false;
-        playpause.style.display = 'inline-block'
-        playpause.innerHTML = '⏸'
+        let notPlaying = false;
+        try {
+            music.play()
+            paused = false;
+            playpause.style.display = 'inline-block'
+            playpause.innerHTML = '⏸'
+        }
+        catch(e) {
+            console.error(e)
+            paused = true;
+            playpause.style.display = 'inline-block'
+            playpause.innerHTML = '▶️'
+            notPlaying = true;
+        }
         music.loop = true
         // const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
         let audioCtx, source;
