@@ -178,8 +178,8 @@ const playMusic = () => {
             audioCtx = new (window.AudioContext ?? window.webkitAudioContext)();
             analyser = audioCtx.createAnalyser();
             source = audioCtx.createMediaElementSource(music);
-            source.connect(audioCtx.destination);
-            // source.connect(analyser);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
             analyser.fftSize = scaleLen * 2;
             bufferLength = analyser.frequencyBinCount;
             musicPlaying = true;
