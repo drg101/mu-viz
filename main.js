@@ -182,14 +182,15 @@ const playMusic = () => {
             audioCtx = new (window.AudioContext ?? window.webkitAudioContext)();
             analyser = audioCtx.createAnalyser();
             analyser.fftSize = scaleLen * 2;
+            // const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
+            source = audioCtx.createMediaElementSource(music);
+            // source = audioCtx.createMediaStreamSource(stream);
+            source.connect(audioCtx.destination);
+            source.connect(analyser);
             bufferLength = analyser.frequencyBinCount;
             musicPlaying = true;
         }
-        const stream = music.mozCaptureStream ? music.mozCaptureStream() : music.captureStream()
-        // source = audioCtx.createMediaElementSource(music);
-        source = audioCtx.createMediaStreamSource(stream);
-        // source.connect(audioCtx.destination);
-        source.connect(analyser);
+
         dataArray = new Uint8Array(bufferLength);
 
         let scaleBarriers = [6.875, 13.75, 27.5, 55, 110, 220, 440, 880, 1760, 3520, 7040, 14080]
