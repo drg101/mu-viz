@@ -39,10 +39,10 @@ const ratio = width / 1600;
 ctx.font = `${Math.floor(72 * ratio)}px Roboto`;
 ctx.fillStyle = "white";
 ctx.textAlign = "center";
-ctx.fillText("Music Visualizer", width / 2, height / 2 - Math.floor(80 * ratio));
+ctx.fillText(safariAgent ? "Please Switch to Chrome or Firefox." : "Music Visualizer", width / 2, height / 2 - Math.floor(80 * ratio));
 ctx.font = `${Math.floor(48 * ratio)}px Roboto`;
-ctx.fillText("Select a song or drag a music file onto this page.", width / 2, height / 2);
-ctx.fillText("⚠️Flashing Colors & Lights⚠️", width / 2, height / 2 + Math.floor(70 * ratio));
+ctx.fillText(safariAgent ? "Safari is not supported!" : "Select a song or drag a music file onto this page.", width / 2, height / 2);
+ctx.fillText(safariAgent ? "" : "⚠️ Flashing Colors & Lights ⚠️", width / 2, height / 2 + Math.floor(70 * ratio));
 
 const setListeners = () => {
     inputElement.addEventListener("change", onMusicUpload, false);
