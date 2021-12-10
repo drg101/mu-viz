@@ -19,28 +19,30 @@ console.log({ safariAgent })
 const ctx = canv.getContext("2d");
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
-let WIDTH = ctx.canvas.width;
-let HEIGHT = ctx.canvas.height;
+let w = ctx.canvas.width;
+let h = ctx.canvas.height;
 const music = new Audio();
 let musicPlaying = false;
 let paused = true;
 let allowFlash = true;
 let allowbgFlash = true;
+const wh = {
+    WIDTH: w,
+    HEIGHT: h
+}
 
-setInterval(() => {
-    WIDTH = ctx.canvas.width;
-    HEIGHT = ctx.canvas.height;
-}, 100)
+let width = w
+let height = h
 
-const ratio = WIDTH / 1600;
+const ratio = width / 1600;
 
 ctx.font = `${Math.floor(72 * ratio)}px Roboto`;
 ctx.fillStyle = "white";
 ctx.textAlign = "center";
-ctx.fillText("Music Visualizer", WIDTH / 2, HEIGHT / 2 - Math.floor(80 * ratio));
+ctx.fillText("Music Visualizer", width / 2, height / 2 - Math.floor(80 * ratio));
 ctx.font = `${Math.floor(48 * ratio)}px Roboto`;
-ctx.fillText("Select a song or drag a music file onto this page.", WIDTH / 2, HEIGHT / 2);
-ctx.fillText("⚠️Flashing Colors & Lights⚠️", WIDTH / 2, HEIGHT / 2 + Math.floor(70 * ratio));
+ctx.fillText("Select a song or drag a music file onto this page.", width / 2, height / 2);
+ctx.fillText("⚠️Flashing Colors & Lights⚠️", width / 2, height / 2 + Math.floor(70 * ratio));
 
 const setListeners = () => {
     inputElement.addEventListener("change", onMusicUpload, false);
@@ -193,11 +195,19 @@ const playMusic = () => {
         let scaleBarriers = [6.875, 13.75, 27.5, 55, 110, 220, 440, 880, 1760, 3520, 7040, 14080]
 
         const draw = () => {
+            const { width, height } = ctx.canvas.getBoundingClientRect();
+            wh.WIDTH = width;
+            wh.HEIGHT = height;
+            ctx.canvas.width = width;
+            ctx.canvas.height = height;
+            // console.log(wh)
+            const { WIDTH, HEIGHT } = wh;
+            // console.log({WIDTH, HEIGHT})
             const numBuckets = getBaseLog(2, scaleLen);
             analyser.getByteFrequencyData(dataArray);
             ctx.clearRect(0, 0, WIDTH, HEIGHT);
             const barWidth = (WIDTH / numBuckets);
-            console.log(barWidth)
+            // console.log(barWidth)
             let x = 0;
             let barHeight;
             // console.log(bufferLength)
