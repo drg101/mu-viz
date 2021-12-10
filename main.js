@@ -197,6 +197,7 @@ const playMusic = () => {
             analyser.getByteFrequencyData(dataArray);
             ctx.clearRect(0, 0, WIDTH, HEIGHT);
             const barWidth = (WIDTH / numBuckets);
+            console.log(barWidth)
             let x = 0;
             let barHeight;
             // console.log(bufferLength)
@@ -250,7 +251,7 @@ const playMusic = () => {
                 }
                 ctx.fillRect(x, HEIGHT - barHeight + barWidth / 2, barWidth, barHeight);
                 ctx.beginPath();
-                ctx.ellipse(x + barWidth / 2, HEIGHT - barHeight + barWidth / 2, barWidth / 2, barWidth / 2, 0, 0, Math.PI * 2);
+                ctx.arc(x + barWidth / 2, HEIGHT - barHeight + barWidth / 2, barWidth / 2, 0, Math.PI * 2);
                 ctx.fill();
                 x += barWidth;
             }
